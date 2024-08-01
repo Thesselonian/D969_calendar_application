@@ -15,11 +15,9 @@ namespace calendarApp
 {
     public partial class loginForm : Form
     {
-        private DBConnection dbCon;
         private String regionName; // data member to hold the name of the region that the user is in
-        public loginForm(DBConnection dbCon)
+        public loginForm()
         {
-            this.dbCon = dbCon;
             InitializeComponent();
             var regionInfo = RegionInfo.CurrentRegion; // instantiate class for region info
             var displayName = regionInfo.DisplayName;
@@ -33,16 +31,27 @@ namespace calendarApp
             string providedPassword = loginPassword.Text;
             if(providedUsername != "" &&  providedPassword != "")
             {
+                string connectionString = "Server=localhost; database=client_schedule; UID=sqlUser; password=Passw0rd!";
+                MySqlConnection connection = new MySqlConnection(connectionString);
+                connection.Open();
                 string query = "SELECT count(username) FROM user WHERE username = '" + providedUsername + "' AND password = '" + providedPassword + "';";
-                var cmd = new MySqlCommand(query, this.dbCon.Connection);
+                var cmd = new MySqlCommand(query, connection);
                 int numberResultRows = Convert.ToInt32(cmd.ExecuteScalar());
                 if(numberResultRows > 0 )
                 {
                     query = "SELECT userId FROM user WHERE username = '" + providedUsername + "' AND password = '" + providedPassword + "';";
-                    cmd = new MySqlCommand(query, this.dbCon.Connection);
+                    cmd = new MySqlCommand(query, connection);
                     int userId = Convert.ToInt32(cmd.ExecuteScalar());
-                    customerForm customerForm = new customerForm(dbCon, userId);
+                    customerForm customerForm = new customerForm(userId);
                     this.Visible = false;
+                    string appointmentsQuery = string.Format("SELECT * FROM appointment, customer WHERE userId = {0} AND appointment.customerId = customer.customerId;", userId);
+                    cmd = new MySqlCommand(appointmentsQuery, connection);
+                    MySqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        withinFifteenMinutes(reader);
+
+                    }
                     customerForm.Show();
                 }
                 else
@@ -52,10 +61,21 @@ namespace calendarApp
                     string translated = Translate(unsuccessfulLoginNote, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
                     loginStatus.Text = "You are located in region " + this.regionName + "\r\n" + unsuccessfulLoginNote + "\r\n" + translated;
                 }
+                connection.Close();
             }
             else
             {
                 MessageBox.Show("Must provide a valid username and password");
+            }
+        }
+        private void withinFifteenMinutes(MySqlDataReader reader) // a function to check if appointment is within 15 minutes of current time. If it is a popup is displayed to notify user
+        {
+            DateTime currentDateTime = DateTime.Now;
+            DateTime fifteenMinutesFromNow = currentDateTime.AddMinutes(15);
+            DateTime appointmentDateTimeLocal = reader.GetDateTime("start").ToLocalTime();
+            if (appointmentDateTimeLocal >= currentDateTime && appointmentDateTimeLocal <= fifteenMinutesFromNow)
+            {
+                MessageBox.Show(string.Format("Appointment with {0} involving {1} at {2} is within the next fifteen minutes.", Convert.ToString(reader["customerName"]), Convert.ToString(reader["type"]), appointmentDateTimeLocal.ToString()), "Upcoming Appointment");
             }
         }
         public String Translate(String word, string toLanguage) // function to translate error message to another language

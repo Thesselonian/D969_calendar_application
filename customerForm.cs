@@ -17,13 +17,11 @@ namespace calendarApp
 {
     public partial class customerForm : Form
     {
-        private DBConnection dbCon;
         private int userId;
        
-        public customerForm(DBConnection dbCon, int userId)
+        public customerForm(int userId)
         {
             this.userId = userId;
-            this.dbCon = dbCon;
             InitializeComponent();
             getTable();
         }
@@ -38,7 +36,6 @@ namespace calendarApp
                 //VarribleKeeper.MySQLConnectionString = your connection string
                 //info being your table name
                 string MySQLConnectionString = "Server = localhost; database = client_schedule; UID = sqlUser; password = Passw0rd!";
-                ;
                 MySqlConnection mysqlCon = new MySqlConnection(MySQLConnectionString);
                 mysqlCon.Open();
 
@@ -54,7 +51,9 @@ namespace calendarApp
                 bSource.DataSource = table;
 
                 customerTable.DataSource = bSource;
-                
+                mysqlCon.Close();
+
+
             }
             catch (MySqlException err)
             {
@@ -63,7 +62,7 @@ namespace calendarApp
         }
         private void newCustomerButton_Click(object sender, EventArgs e)
         {
-            customerEdit customerEdit = new customerEdit(this.dbCon, this, this.userId);
+            customerEdit customerEdit = new customerEdit(this, this.userId);
             customerEdit.ShowDialog();
         }
         private void editCustomerButton_Click(object sender, EventArgs e)
@@ -79,7 +78,7 @@ namespace calendarApp
                 string address = Convert.ToString(customerTable.SelectedRows[0].Cells["address"].Value);
                 string city = Convert.ToString(customerTable.SelectedRows[0].Cells["city"].Value);
                 string country = Convert.ToString(customerTable.SelectedRows[0].Cells["country"].Value);
-                customerEdit customerEdit = new customerEdit(this.dbCon, this, this.userId, customerId, addressId, cityId, countryId, customerName, phone, address, city, country);
+                customerEdit customerEdit = new customerEdit(this, this.userId, customerId, addressId, cityId, countryId, customerName, phone, address, city, country);
                 this.Dispose();
                 customerEdit.ShowDialog();
             }
@@ -100,19 +99,28 @@ namespace calendarApp
         {
             if (customerTable.SelectedRows.Count > 0)
             {
-                var confirmResult = MessageBox.Show("Are you sure to delete this item ??",
-                                         "Confirm Delete!!",
-                                         MessageBoxButtons.YesNo);
+                var confirmResult = MessageBox.Show("Are you sure to delete this item ??","Confirm Delete!!",MessageBoxButtons.YesNo);
                 if (confirmResult == DialogResult.Yes)
                 {
-                    int customerId = Convert.ToInt32(customerTable.SelectedRows[0].Cells["customerId"].Value);
-                    string query = $"DELETE FROM customer WHERE customerId = {customerId};";
-                    var cmd = new MySqlCommand(query, this.dbCon.Connection);
-                    cmd.ExecuteNonQuery();
-                    this.Visible = false;
-                    this.Dispose();
-                    customerForm newCustomerForm = new customerForm(dbCon, this.userId);
-                    newCustomerForm.ShowDialog();
+                    try
+                    {
+                        int customerId = Convert.ToInt32(customerTable.SelectedRows[0].Cells["customerId"].Value);
+                        string connectionString = "Server=localhost; database=client_schedule; UID=sqlUser; password=Passw0rd!";
+                        MySqlConnection connection = new MySqlConnection(connectionString);
+                        connection.Open();
+                        string query = $"DELETE FROM customer WHERE customerId = {customerId};";
+                        var cmd = new MySqlCommand(query, connection);
+                        cmd.ExecuteNonQuery();
+                        this.Visible = false;
+                        this.Dispose();
+                        customerForm newCustomerForm = new customerForm(this.userId);
+                        newCustomerForm.ShowDialog();
+                        connection.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
                 }
             }
             else

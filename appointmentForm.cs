@@ -61,6 +61,7 @@ namespace calendarApp
                 string rows = string.Format("{0}:{1}", row.ItemArray[0], row.ItemArray[1]);
                 customerComboBox.Items.Add(rows);
             }
+            customerConnection.Close();
             MySqlConnection connection = new MySqlConnection(MySQLConnectionString);
             connection.Open();
             string appointmentQuery = $"SELECT * FROM appointment, customer WHERE appointmentId = {appointmentId} AND appointment.customerId = customer.customerId;";
@@ -86,8 +87,9 @@ namespace calendarApp
             string MySQLConnectionString = "Server=localhost; database=client_schedule; UID=sqlUser; password=Passw0rd!";
             MySqlConnection connection = new MySqlConnection(MySQLConnectionString);
             connection.Open();
-            string query = $@"SELECT COUNT(appointmentId) FROM appointment WHERE (start BETWEEN '{startDateTime.ToString("yyyy-MM-dd HH:mm:ss")}' AND '{endDateTime.ToString("yyyy-MM-dd HH:mm:ss")}')
-                OR (end BETWEEN '{startDateTime.ToString("yyyy-MM-dd HH:mm:ss")}' AND '{endDateTime.ToString("yyyy-MM-dd HH:mm:ss")}');";
+            string query = $@"SELECT COUNT(appointmentId) FROM appointment WHERE ((start BETWEEN '{startDateTime.ToString("yyyy-MM-dd HH:mm:ss")}' AND '{endDateTime.ToString("yyyy-MM-dd HH:mm:ss")}')
+                OR (end BETWEEN '{startDateTime.ToString("yyyy-MM-dd HH:mm:ss")}' AND '{endDateTime.ToString("yyyy-MM-dd HH:mm:ss")}'))AND appointmentId <> {this.appointmentId};";
+            Console.WriteLine(query);
             var cmd = new MySqlCommand(query, connection);
             int numberOverlappingAppointments = Convert.ToInt32(cmd.ExecuteScalar());
             connection.Close();
@@ -103,66 +105,72 @@ namespace calendarApp
 
         private void saveAppointmentButton_Click(object sender, EventArgs e)
         {
-            bool validSubmission = true;
-            string errorMessage = "";
-            if(customerComboBox.SelectedItem == null) {
-                validSubmission = false;
-                errorMessage = "You must select a customer for the appointment";
-            }
-            if(appointmentType.Text == "")
+            try
             {
-                validSubmission = false;
-                errorMessage = "You must provide an appointment type";
+                bool validSubmission = true;
+                string errorMessage = "";
+                if(customerComboBox.SelectedItem == null) {
+                    validSubmission = false;
+                    errorMessage = "You must select a customer for the appointment";
+                }
+                if(appointmentType.Text == "")
+                {
+                    validSubmission = false;
+                    errorMessage = "You must provide an appointment type";
+                }
+                DateTime startDateTime = new DateTime(appointmentStart.Value.Date.Year, appointmentStart.Value.Date.Month, appointmentStart.Value.Date.Day, appointmentStartTime.Value.Hour, appointmentStartTime.Value.Minute, 0, DateTimeKind.Local);
+                DateTime startDateTimeUtc = startDateTime.ToUniversalTime();
+                DateTime endDateTime = new DateTime(appointmentEnd.Value.Date.Year, appointmentEnd.Value.Date.Month, appointmentEnd.Value.Date.Day, appointmentEndTime.Value.Hour, appointmentEndTime.Value.Minute, 0, DateTimeKind.Local);
+                DateTime endDateTimeUtc = endDateTime.ToUniversalTime();
+                TimeZoneInfo easternTimeInfo = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                DateTime easternStartTime = TimeZoneInfo.ConvertTimeFromUtc(startDateTimeUtc, easternTimeInfo);
+                DateTime easternEndTime = TimeZoneInfo.ConvertTimeFromUtc(endDateTimeUtc, easternTimeInfo);
+                DateTime businessStartTime = new DateTime(appointmentStart.Value.Date.Year, appointmentStart.Value.Date.Month, appointmentStart.Value.Date.Day, 09, 0, 0); // DateTime structs to represent start and end of business day in eastern time.
+                DateTime businessEndTime = new DateTime(appointmentStart.Value.Date.Year, appointmentStart.Value.Date.Month, appointmentStart.Value.Date.Day, 17, 0, 0);
+                if(easternStartTime < businessStartTime || easternStartTime >= businessEndTime || easternEndTime <= businessStartTime || easternEndTime > businessEndTime) // if the start or end time for the appointment are outside business hours eastern time
+                {
+                    validSubmission = false;
+                    errorMessage = "The appointment start and end times must be between 9 AM and 5 PM Eastern Standard Time.";
+                }
+                if (!validateAppointmentTime(startDateTimeUtc, endDateTimeUtc))
+                {
+                    validSubmission = false;
+                    errorMessage = "Provided dates overlap with existing appointment.";
+                }
+                if(startDateTimeUtc >= endDateTimeUtc)
+                {
+                    validSubmission = false;
+                    errorMessage = "Appointment end time must be after the start time.";
+                }
+                if (!validSubmission)
+                {
+                    MessageBox.Show(errorMessage);
+                }
+                else
+                {
+                    string customerSelection = customerComboBox.SelectedItem.ToString();
+                    string customerId = customerSelection.Substring(0, customerSelection.IndexOf(":", 0));
+                    string mysqlconnectionstring = "server=localhost; database=client_schedule; uid=sqlUser; password=Passw0rd!";
+                    MySqlConnection connection = new MySqlConnection(mysqlconnectionstring);
+                    connection.Open();
+                    // if form is in edit mode run an update query, otherwise run an insert
+                    string query = (!this.edit) ? 
+                        ($@"insert into `client_schedule`.`appointment`(`customerid`,`userid`,`title`,`description`,`location`,`contact`,`type`,`url`,`start`,`end`,`createdate`,`createdby`,`lastupdate`,`lastupdateby`)
+                        values({customerId}, '{this.userId}', '', '', '','', '{appointmentType.Text}','', '{startDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")}','{endDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")}', NOW(),'', NOW(),'');") :
+                        ($@"UPDATE `client_schedule`.`appointment` SET `customerId` = {customerId}, `type` = '{appointmentType.Text}', `start` = '{startDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")}',
+                        `end` = '{endDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")}' WHERE `appointmentId` = {this.appointmentId};");
+                    var cmd = new MySqlCommand(query, connection);
+                    cmd.ExecuteNonQuery();
+                    connection.Close();
+                    calendar newCalendar = new calendar(this.userId);
+                    this.Visible = false;
+                    this.Dispose();
+                    newCalendar.ShowDialog();
+                }
             }
-            DateTime startDateTime = new DateTime(appointmentStart.Value.Date.Year, appointmentStart.Value.Date.Month, appointmentStart.Value.Date.Day, appointmentStartTime.Value.Hour, appointmentStartTime.Value.Minute, 0, DateTimeKind.Local);
-            DateTime startDateTimeUtc = startDateTime.ToUniversalTime();
-            DateTime endDateTime = new DateTime(appointmentEnd.Value.Date.Year, appointmentEnd.Value.Date.Month, appointmentEnd.Value.Date.Day, appointmentEndTime.Value.Hour, appointmentEndTime.Value.Minute, 0, DateTimeKind.Local);
-            DateTime endDateTimeUtc = endDateTime.ToUniversalTime();
-            TimeZoneInfo easternTimeInfo = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            DateTime easternStartTime = TimeZoneInfo.ConvertTimeFromUtc(startDateTimeUtc, easternTimeInfo);
-            DateTime easternEndTime = TimeZoneInfo.ConvertTimeFromUtc(endDateTimeUtc, easternTimeInfo);
-            DateTime businessStartTime = new DateTime(appointmentStart.Value.Date.Year, appointmentStart.Value.Date.Month, appointmentStart.Value.Date.Day, 09, 0, 0); // DateTime structs to represent start and end of business day in eastern time.
-            DateTime businessEndTime = new DateTime(appointmentStart.Value.Date.Year, appointmentStart.Value.Date.Month, appointmentStart.Value.Date.Day, 17, 0, 0);
-            if(easternStartTime < businessStartTime || easternStartTime >= businessEndTime || easternEndTime <= businessStartTime || easternEndTime > businessEndTime) // if the start or end time for the appointment are outside business hours eastern time
+            catch(Exception ex)
             {
-                validSubmission = false;
-                errorMessage = "The appointment start and end times must be between 9 AM and 5 PM Eastern Standard Time.";
-            }
-            if (!validateAppointmentTime(startDateTimeUtc, endDateTimeUtc))
-            {
-                validSubmission = false;
-                errorMessage = "Provided dates overlap with existing appointment.";
-            }
-            if(startDateTimeUtc >= endDateTimeUtc)
-            {
-                validSubmission = false;
-                errorMessage = "Appointment end time must be after the start time.";
-            }
-            if (!validSubmission)
-            {
-                MessageBox.Show(errorMessage);
-            }
-            else
-            {
-                string customerSelection = customerComboBox.SelectedItem.ToString();
-                string customerId = customerSelection.Substring(0, customerSelection.IndexOf(":", 0));
-                string mysqlconnectionstring = "server=localhost; database=client_schedule; uid=sqlUser; password=Passw0rd!";
-                MySqlConnection connection = new MySqlConnection(mysqlconnectionstring);
-                connection.Open();
-                // if form is in edit mode run an update query, otherwise run an insert
-                string query = (!this.edit) ? 
-                    ($@"insert into `client_schedule`.`appointment`(`customerid`,`userid`,`title`,`description`,`location`,`contact`,`type`,`url`,`start`,`end`,`createdate`,`createdby`,`lastupdate`,`lastupdateby`)
-                    values({customerId}, '{this.userId}', '', '', '','', '{appointmentType.Text}','', '{startDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")}','{endDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")}', NOW(),'', NOW(),'');") :
-                    ($@"UPDATE `client_schedule`.`appointment` SET `customerId` = {customerId}, `type` = '{appointmentType.Text}', `start` = '{startDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")}',
-                    `end` = '{endDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")}' WHERE `appointmentId` = {this.appointmentId};");
-                Console.WriteLine(query);
-                var cmd = new MySqlCommand(query, connection);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-                calendar newCalendar = new calendar(this.userId);
-                this.Visible = false;
-                this.Dispose();
-                newCalendar.ShowDialog();
+                MessageBox.Show(ex.Message);
             }
         }
     }

@@ -16,17 +16,9 @@ namespace calendarApp
         [STAThread]
         static void Main()
         {
-            var dbCon = DBConnection.Instance();
-            dbCon.Server = "localhost";
-            dbCon.DatabaseName = "client_schedule";
-            dbCon.UserName = "sqlUser";
-            dbCon.Password = "Passw0rd!";
-            if (dbCon.IsConnect())
-            {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new loginForm(dbCon));
-            }
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new loginForm());
         }
     }
 }

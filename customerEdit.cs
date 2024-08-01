@@ -15,7 +15,6 @@ namespace calendarApp
 {
     public partial class customerEdit : Form
     {
-        DBConnection dbCon; // connection to mysql database
         customerForm customerForm;
         int userId;
         int customerId; // data members for the various table foreign keys
@@ -28,22 +27,20 @@ namespace calendarApp
         int countryId;
         string country;
         bool edit; // whether we are editting or creating new customer
-        public customerEdit(DBConnection dbCon, customerForm customerForm, int userId)
+        public customerEdit(customerForm customerForm, int userId)
         {
             this.userId = userId;
             this.edit = false; // in create new customer mode
-            this.dbCon = dbCon;
             this.customerForm = customerForm;
             InitializeComponent();
             this.customerForm.Close(); // kill the previous customer form
         }
-        public customerEdit(DBConnection dbCon, customerForm customerForm, int userId, int customerId, int addressId, int cityId, int countryId, string customerName, string phone, string address, string city, string country)
+        public customerEdit(customerForm customerForm, int userId, int customerId, int addressId, int cityId, int countryId, string customerName, string phone, string address, string city, string country)
         {
             InitializeComponent();
             this.userId = userId;
             this.customerForm = customerForm;
             this.edit = true; // in edit customer mode
-            this.dbCon = dbCon;
             this.customerId = customerId;
             this.addressId = addressId;
             this.cityId = cityId;
@@ -79,59 +76,63 @@ namespace calendarApp
             {
                 try
                 {
+                    string connectionString = "Server=localhost; database=client_schedule; UID=sqlUser; password=Passw0rd!";
+                    MySqlConnection connection = new MySqlConnection(connectionString);
+                    connection.Open();
                     if (this.edit)
                     {
                         // update country name
-                        string query = "UPDATE calendar_application.country SET country = '" + this.customerCountryInput.Text.Trim(' ') + "' WHERE countryId = '" + this.countryId + "';";
-                        var cmd = new MySqlCommand(query, this.dbCon.Connection);
+                        string query = "UPDATE client_schedule.country SET country = '" + this.customerCountryInput.Text.Trim(' ') + "' WHERE countryId = '" + this.countryId + "';";
+                        var cmd = new MySqlCommand(query, connection);
                         cmd.ExecuteNonQuery();
                         // update city name
-                        query = "UPDATE calendar_application.city SET city = '" + this.customerCityInput.Text.Trim(' ') + "' WHERE cityId = '" + this.cityId + "';";
-                        cmd = new MySqlCommand(query, this.dbCon.Connection);
+                        query = "UPDATE client_schedule.city SET city = '" + this.customerCityInput.Text.Trim(' ') + "' WHERE cityId = '" + this.cityId + "';";
+                        cmd = new MySqlCommand(query, connection);
                         cmd.ExecuteNonQuery();
                         // update address and phone
-                        query = "UPDATE calendar_application.address SET address = '" + this.customerAddressInput.Text.Trim(' ') + "', phone = '" + this.customerPhoneInput.Text.Trim(' ') + "' WHERE addressId = '" + this.addressId + "';";
-                        cmd = new MySqlCommand(query, this.dbCon.Connection);
+                        query = "UPDATE client_schedule.address SET address = '" + this.customerAddressInput.Text.Trim(' ') + "', phone = '" + this.customerPhoneInput.Text.Trim(' ') + "' WHERE addressId = '" + this.addressId + "';";
+                        cmd = new MySqlCommand(query, connection);
                         cmd.ExecuteNonQuery();
                         // update customer name
-                        query = "UPDATE calendar_application.customer SET customerName = '" + this.customerNameInput.Text.Trim(' ') + "' WHERE customerId = '" + this.customerId + "';";
-                        cmd = new MySqlCommand(query, this.dbCon.Connection);
+                        query = "UPDATE client_schedule.customer SET customerName = '" + this.customerNameInput.Text.Trim(' ') + "' WHERE customerId = '" + this.customerId + "';";
+                        cmd = new MySqlCommand(query, connection);
                         cmd.ExecuteNonQuery();
                     }
                     else
                     {
                         // insert country name
-                        string query = "INSERT INTO `calendar_application`.`country` (`country`,`createDate`,`createdBy`,`lastUpdate`,`lastUpdateBy`) VALUES ('" + this.customerCountryInput.Text.Trim(' ') + "',CURRENT_DATE(),'',CURRENT_DATE(),'');";
-                        var cmd = new MySqlCommand(query, this.dbCon.Connection);
+                        string query = "INSERT INTO `client_schedule`.`country` (`country`,`createDate`,`createdBy`,`lastUpdate`,`lastUpdateBy`) VALUES ('" + this.customerCountryInput.Text.Trim(' ') + "',CURRENT_DATE(),'',CURRENT_DATE(),'');";
+                        var cmd = new MySqlCommand(query, connection);
                         cmd.ExecuteNonQuery();
-                        string maxIdQuery = "SELECT MAX(countryId) FROM calendar_application.country;"; // get the id for the country that was just inserted
-                        cmd = new MySqlCommand(maxIdQuery, this.dbCon.Connection);
+                        string maxIdQuery = "SELECT MAX(countryId) FROM client_schedule.country;"; // get the id for the country that was just inserted
+                        cmd = new MySqlCommand(maxIdQuery, connection);
                         int insertedCountryId = Convert.ToInt32(cmd.ExecuteScalar());
                         //insert city
-                        query = $@"INSERT INTO `calendar_application`.`city` (`city`,`countryId`,`createDate`,`createdBy`,`lastUpdate`,`lastUpdateBy`) VALUES('{this.customerCityInput.Text.Trim(' ')}','{insertedCountryId}',CURRENT_DATE(),'',CURRENT_DATE(),'');";
-                        cmd = new MySqlCommand(query, this.dbCon.Connection);
+                        query = $@"INSERT INTO `client_schedule`.`city` (`city`,`countryId`,`createDate`,`createdBy`,`lastUpdate`,`lastUpdateBy`) VALUES('{this.customerCityInput.Text.Trim(' ')}','{insertedCountryId}',CURRENT_DATE(),'',CURRENT_DATE(),'');";
+                        cmd = new MySqlCommand(query, connection);
                         cmd.ExecuteNonQuery();
-                        maxIdQuery = "SELECT MAX(cityId) FROM calendar_application.city;"; // get the id for the city that was just inserted
-                        cmd = new MySqlCommand(maxIdQuery, this.dbCon.Connection);
+                        maxIdQuery = "SELECT MAX(cityId) FROM client_schedule.city;"; // get the id for the city that was just inserted
+                        cmd = new MySqlCommand(maxIdQuery, connection);
                         int insertedCityId = Convert.ToInt32(cmd.ExecuteScalar());
                         // insert address and phone
-                        query = $@"INSERT INTO `calendar_application`.`address`(`address`, `address2`, `postalCode`, `cityId`,`phone`,`createDate`,`createdBy`,`lastUpdate`,`lastUpdateBy`)
+                        query = $@"INSERT INTO `client_schedule`.`address`(`address`, `address2`, `postalCode`, `cityId`,`phone`,`createDate`,`createdBy`,`lastUpdate`,`lastUpdateBy`)
                             VALUES('{this.customerAddressInput.Text.Trim(' ')}', '', '', '{ insertedCityId }', '{this.customerPhoneInput.Text.Trim(' ')}',CURRENT_DATE(),'',CURRENT_DATE(),'');";
-                        cmd = new MySqlCommand(query, this.dbCon.Connection);
+                        cmd = new MySqlCommand(query, connection);
                         cmd.ExecuteNonQuery();
-                        maxIdQuery = "SELECT MAX(addressId) FROM calendar_application.address;"; // get the id for the address that was just inserted
-                        cmd = new MySqlCommand(maxIdQuery, this.dbCon.Connection);
+                        maxIdQuery = "SELECT MAX(addressId) FROM client_schedule.address;"; // get the id for the address that was just inserted
+                        cmd = new MySqlCommand(maxIdQuery, connection);
                         int insertedAddressId = Convert.ToInt32(cmd.ExecuteScalar());
                         // insert customer
-                        query = $@"INSERT INTO `calendar_application`.`customer`(`customerName`,`addressId`,`active`,`createDate`,`createdBy`,`lastUpdate`,`lastUpdateBy`)
+                        query = $@"INSERT INTO `client_schedule`.`customer`(`customerName`,`addressId`,`active`,`createDate`,`createdBy`,`lastUpdate`,`lastUpdateBy`)
                             VALUES('{this.customerNameInput.Text.Trim(' ')}',{insertedAddressId},1,CURRENT_DATE(),'',CURRENT_DATE(),'');
                         ; ";
-                        cmd = new MySqlCommand(query, this.dbCon.Connection);
+                        cmd = new MySqlCommand(query, connection);
                         cmd.ExecuteNonQuery();
                     }
+                    connection.Close();
                     this.Visible = false; // hide customer edit form
                     this.Dispose();
-                    customerForm customerForm = new customerForm(dbCon, this.userId); // make new customer form
+                    customerForm customerForm = new customerForm(this.userId); // make new customer form
                     customerForm.ShowDialog(); // show newly created customer form
 
                 }

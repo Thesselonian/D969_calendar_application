@@ -45,3 +45,4 @@ C:\Users\Eric\school\wgu\D969_software_2\D969_calendar_application\obj\Debug\cal
 C:\Users\Eric\school\wgu\D969_software_2\D969_calendar_application\obj\Debug\calendarApp.customerEdit.resources
 C:\Users\Eric\school\wgu\D969_software_2\D969_calendar_application\obj\Debug\calendarApp.appointmentForm.resources
 C:\Users\Eric\school\wgu\D969_software_2\D969_calendar_application\obj\Debug\calendarApp.calendar.resources
+C:\Users\Eric\school\wgu\D969_software_2\D969_calendar_application\obj\Debug\calendarApp.appointmentsReport.resources

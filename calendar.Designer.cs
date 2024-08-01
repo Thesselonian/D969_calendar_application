@@ -37,6 +37,11 @@
             this.showAllAppointments = new System.Windows.Forms.RadioButton();
             this.showMonthAppointments = new System.Windows.Forms.RadioButton();
             this.showWeekAppointments = new System.Windows.Forms.RadioButton();
+            this.appointmentsByDay = new System.Windows.Forms.RadioButton();
+            this.selectAppointmentsDay = new System.Windows.Forms.DateTimePicker();
+            this.numberAppointmentTypesByMonth = new System.Windows.Forms.Button();
+            this.appointmentsByUser = new System.Windows.Forms.Button();
+            this.totalUserAppointments = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.appointmentsTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
@@ -108,7 +113,7 @@
             // 
             this.showAllAppointments.AutoSize = true;
             this.showAllAppointments.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.showAllAppointments.Location = new System.Drawing.Point(317, 11);
+            this.showAllAppointments.Location = new System.Drawing.Point(228, 12);
             this.showAllAppointments.Name = "showAllAppointments";
             this.showAllAppointments.Size = new System.Drawing.Size(180, 29);
             this.showAllAppointments.TabIndex = 7;
@@ -121,7 +126,7 @@
             // 
             this.showMonthAppointments.AutoSize = true;
             this.showMonthAppointments.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.showMonthAppointments.Location = new System.Drawing.Point(566, 9);
+            this.showMonthAppointments.Location = new System.Drawing.Point(484, 12);
             this.showMonthAppointments.Name = "showMonthAppointments";
             this.showMonthAppointments.Size = new System.Drawing.Size(256, 29);
             this.showMonthAppointments.TabIndex = 8;
@@ -134,7 +139,7 @@
             // 
             this.showWeekAppointments.AutoSize = true;
             this.showWeekAppointments.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.showWeekAppointments.Location = new System.Drawing.Point(844, 9);
+            this.showWeekAppointments.Location = new System.Drawing.Point(808, 9);
             this.showWeekAppointments.Name = "showWeekAppointments";
             this.showWeekAppointments.Size = new System.Drawing.Size(253, 29);
             this.showWeekAppointments.TabIndex = 9;
@@ -143,11 +148,72 @@
             this.showWeekAppointments.UseVisualStyleBackColor = true;
             this.showWeekAppointments.CheckedChanged += new System.EventHandler(this.showAppointments);
             // 
+            // appointmentsByDay
+            // 
+            this.appointmentsByDay.AutoSize = true;
+            this.appointmentsByDay.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.appointmentsByDay.Location = new System.Drawing.Point(1115, 9);
+            this.appointmentsByDay.Name = "appointmentsByDay";
+            this.appointmentsByDay.Size = new System.Drawing.Size(221, 29);
+            this.appointmentsByDay.TabIndex = 11;
+            this.appointmentsByDay.TabStop = true;
+            this.appointmentsByDay.Text = "Appointments By Day";
+            this.appointmentsByDay.UseVisualStyleBackColor = true;
+            this.appointmentsByDay.CheckedChanged += new System.EventHandler(this.showAppointments);
+            // 
+            // selectAppointmentsDay
+            // 
+            this.selectAppointmentsDay.CalendarFont = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.selectAppointmentsDay.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.selectAppointmentsDay.Location = new System.Drawing.Point(1260, 57);
+            this.selectAppointmentsDay.Name = "selectAppointmentsDay";
+            this.selectAppointmentsDay.Size = new System.Drawing.Size(360, 30);
+            this.selectAppointmentsDay.TabIndex = 13;
+            this.selectAppointmentsDay.ValueChanged += new System.EventHandler(this.selectAppointmentsDay_ValueChanged);
+            // 
+            // numberAppointmentTypesByMonth
+            // 
+            this.numberAppointmentTypesByMonth.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.numberAppointmentTypesByMonth.Location = new System.Drawing.Point(17, 796);
+            this.numberAppointmentTypesByMonth.Name = "numberAppointmentTypesByMonth";
+            this.numberAppointmentTypesByMonth.Size = new System.Drawing.Size(364, 59);
+            this.numberAppointmentTypesByMonth.TabIndex = 14;
+            this.numberAppointmentTypesByMonth.Text = "Number Appointment Types by Month";
+            this.numberAppointmentTypesByMonth.UseVisualStyleBackColor = true;
+            this.numberAppointmentTypesByMonth.Click += new System.EventHandler(this.numberAppointmentTypesByMonth_Click);
+            // 
+            // appointmentsByUser
+            // 
+            this.appointmentsByUser.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.appointmentsByUser.Location = new System.Drawing.Point(442, 795);
+            this.appointmentsByUser.Name = "appointmentsByUser";
+            this.appointmentsByUser.Size = new System.Drawing.Size(352, 59);
+            this.appointmentsByUser.TabIndex = 15;
+            this.appointmentsByUser.Text = "Appointments By User";
+            this.appointmentsByUser.UseVisualStyleBackColor = true;
+            this.appointmentsByUser.Click += new System.EventHandler(this.appointmentsByUser_Click);
+            // 
+            // totalUserAppointments
+            // 
+            this.totalUserAppointments.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.totalUserAppointments.Location = new System.Drawing.Point(845, 796);
+            this.totalUserAppointments.Name = "totalUserAppointments";
+            this.totalUserAppointments.Size = new System.Drawing.Size(364, 57);
+            this.totalUserAppointments.TabIndex = 16;
+            this.totalUserAppointments.Text = "Total Number of User Appointments";
+            this.totalUserAppointments.UseVisualStyleBackColor = true;
+            this.totalUserAppointments.Click += new System.EventHandler(this.totalUserAppointments_Click);
+            // 
             // calendar
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1588, 908);
+            this.ClientSize = new System.Drawing.Size(1626, 926);
+            this.Controls.Add(this.totalUserAppointments);
+            this.Controls.Add(this.appointmentsByUser);
+            this.Controls.Add(this.numberAppointmentTypesByMonth);
+            this.Controls.Add(this.selectAppointmentsDay);
+            this.Controls.Add(this.appointmentsByDay);
             this.Controls.Add(this.showWeekAppointments);
             this.Controls.Add(this.showMonthAppointments);
             this.Controls.Add(this.showAllAppointments);
@@ -177,5 +243,10 @@
         private System.Windows.Forms.RadioButton showAllAppointments;
         private System.Windows.Forms.RadioButton showMonthAppointments;
         private System.Windows.Forms.RadioButton showWeekAppointments;
+        private System.Windows.Forms.RadioButton appointmentsByDay;
+        private System.Windows.Forms.DateTimePicker selectAppointmentsDay;
+        private System.Windows.Forms.Button numberAppointmentTypesByMonth;
+        private System.Windows.Forms.Button appointmentsByUser;
+        private System.Windows.Forms.Button totalUserAppointments;
     }
 }

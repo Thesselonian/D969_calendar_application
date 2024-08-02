@@ -1,0 +1,26 @@
+database connection:
+https://stackoverflow.com/questions/21618015/how-to-connect-to-mysql-database
+
+translation:
+https://stackoverflow.com/questions/2246017/using-google-translate-in-c-sharp
+
+region information:
+https://stackoverflow.com/questions/46212746/in-c-how-to-get-the-country-or-region-selected-under-region-language-in
+
+mysql datagrid binding
+https://stackoverflow.com/questions/12904854/fill-datagridview-with-mysql-data
+
+confirmation popup
+https://stackoverflow.com/questions/3845695/is-there-a-builtin-confirmation-dialog-in-windows-forms
+
+Combobox from MySql
+https://stackoverflow.com/questions/5158936/c-sharp-mysql-query-result-to-combobox
+
+get week of month
+https://stackoverflow.com/questions/23060121/get-week-of-month-c-sharp
+
+get path to source code file
+https://stackoverflow.com/questions/47841441/how-do-i-get-the-path-to-the-current-c-sharp-source-code-file
+
+write to .txt file
+https://stackoverflow.com/questions/6153074/how-do-i-write-data-to-a-text-file-in-c

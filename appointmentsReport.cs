@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -20,6 +21,7 @@ namespace calendarApp
             InitializeComponent();
             this.type = type;
             this.userId = userId;
+            Func<string, string, string> concatenate = (concatenated, nextLine) => (concatenated += nextLine); // here is a lambda expression used in each of the report. It is helpful for understanding how the concatenation of the report works.
             if(type == "Number of Types By Month")
             {
                 appointmentReportTextboxLabel.Text = "Number of Appointment Types By Month";
@@ -32,7 +34,9 @@ namespace calendarApp
                 string report = "";
                 while(reader.Read())
                 {
-                    report += string.Format("Year: {0} Month: {1} Number of Types: {2}\r\n", Convert.ToString(reader.GetInt32("year")), Convert.ToString(reader.GetInt32("month")), Convert.ToString(reader.GetInt32("count")));
+                    string nextLine = string.Format("Year: {0} Month: {1} Number of Types: {2}\r\n", Convert.ToString(reader.GetInt32("year")), Convert.ToString(reader.GetInt32("month")), Convert.ToString(reader.GetInt32("count")));
+                    report = concatenate(report, nextLine);
+                    //report += string.Format("Year: {0} Month: {1} Number of Types: {2}\r\n", Convert.ToString(reader.GetInt32("year")), Convert.ToString(reader.GetInt32("month")), Convert.ToString(reader.GetInt32("count")));
                 }
                 appointmentReportTextbox.Text = report;
                 connection.Close();
@@ -62,7 +66,8 @@ namespace calendarApp
                         {
                             report += "\r\n \r\n";
                         }
-                        report += "Appointments for " + currentUser + "\r\n";
+                        report = concatenate(report, "Appointments for " + currentUser + "\r\n");
+                        //report += "Appointments for " + currentUser + "\r\n";
                     }
                     report += string.Format("Appointment type: {0} beginning at time {1} ending at time {2} with customer {3}\r\n", Convert.ToString(reader.GetString("type")), startLocal.ToString(), endLocal.ToString(), Convert.ToString(reader.GetString("customerName")));
                     previousUser = currentUser;
@@ -79,7 +84,10 @@ namespace calendarApp
                 string query = "SELECT COUNT(appointmentId) FROM appointment;";
                 MySqlCommand cmd = new MySqlCommand(query, connection);
                 int numberAppointments = Convert.ToInt32(cmd.ExecuteScalar());
-                appointmentReportTextbox.Text = string.Format("There are {0} total appointments", numberAppointments);
+                string report = "";
+                report = concatenate(report, string.Format("There are {0} total appointments", numberAppointments));
+                appointmentReportTextbox.Text = report;
+                //appointmentReportTextbox.Text = string.Format("There are {0} total appointments", numberAppointments);
                 connection.Close();
             }
         }

@@ -64,6 +64,8 @@ namespace calendarApp
         {
             customerEdit customerEdit = new customerEdit(this, this.userId);
             customerEdit.ShowDialog();
+            this.Visible = false;
+            this.Dispose();
         }
         private void editCustomerButton_Click(object sender, EventArgs e)
         {

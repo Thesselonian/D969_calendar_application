@@ -1,15 +1,11 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.IO;
 using System.Globalization;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace calendarApp
 {
@@ -25,11 +21,18 @@ namespace calendarApp
             loginStatus.Text = "You are located in region " + this.regionName;
         }
 
-        private void loginButton_Click(object sender, EventArgs e)
+        private void loginButton_Click(object sender, EventArgs e) // function for when the login button is clicked
         {
+            string fileName = "Login_History.txt,"; // the name of the file for recording login attempts
+            var path = GetThisFilePath();
+            var directory = Path.GetDirectoryName(path);
+            if (!File.Exists(directory + "/" + fileName)) // Check if the file exists
+            {
+                File.CreateText(directory + "/" + fileName); // Create the file
+            }
             string providedUsername = loginUsername.Text;
             string providedPassword = loginPassword.Text;
-            if(providedUsername != "" &&  providedPassword != "")
+            if(providedUsername != "" &&  providedPassword != "") // only if non empty username and password are submitted
             {
                 string connectionString = "Server=localhost; database=client_schedule; UID=sqlUser; password=Passw0rd!";
                 MySqlConnection connection = new MySqlConnection(connectionString);
@@ -37,29 +40,36 @@ namespace calendarApp
                 string query = "SELECT count(username) FROM user WHERE username = '" + providedUsername + "' AND password = '" + providedPassword + "';";
                 var cmd = new MySqlCommand(query, connection);
                 int numberResultRows = Convert.ToInt32(cmd.ExecuteScalar());
-                if(numberResultRows > 0 )
+                using(StreamWriter w = File.AppendText(directory + "/" + fileName))
                 {
-                    query = "SELECT userId FROM user WHERE username = '" + providedUsername + "' AND password = '" + providedPassword + "';";
-                    cmd = new MySqlCommand(query, connection);
-                    int userId = Convert.ToInt32(cmd.ExecuteScalar());
-                    customerForm customerForm = new customerForm(userId);
-                    this.Visible = false;
-                    string appointmentsQuery = string.Format("SELECT * FROM appointment, customer WHERE userId = {0} AND appointment.customerId = customer.customerId;", userId);
-                    cmd = new MySqlCommand(appointmentsQuery, connection);
-                    MySqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                    string loginString = "";
+                    DateTime now = DateTime.Now;
+                    if(numberResultRows > 0 ) // if username and password match a record in the database
                     {
-                        withinFifteenMinutes(reader);
-
+                        query = "SELECT userId FROM user WHERE username = '" + providedUsername + "' AND password = '" + providedPassword + "';";
+                        cmd = new MySqlCommand(query, connection);
+                        int userId = Convert.ToInt32(cmd.ExecuteScalar());
+                        customerForm customerForm = new customerForm(userId);
+                        this.Visible = false;
+                        string appointmentsQuery = string.Format("SELECT * FROM appointment, customer WHERE userId = {0} AND appointment.customerId = customer.customerId;", userId); // upon successful login check for appointments for user within next 15 minutes
+                        cmd = new MySqlCommand(appointmentsQuery, connection);
+                        MySqlDataReader reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            withinFifteenMinutes(reader);
+                        }
+                        customerForm.Show();
+                        loginString = "Successful login using username " + providedUsername + " timestamp " + now.ToString() + "\r\n";
                     }
-                    customerForm.Show();
-                }
-                else
-                {
-                    string unsuccessfulLoginNote = "The username and password do not match.";
-                    string translateTo = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "en" ? ("de") : (CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
-                    string translated = Translate(unsuccessfulLoginNote, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
-                    loginStatus.Text = "You are located in region " + this.regionName + "\r\n" + unsuccessfulLoginNote + "\r\n" + translated;
+                    else
+                    {
+                        string unsuccessfulLoginNote = "The username and password do not match.";
+                        string translateTo = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "en" ? ("de") : (CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+                        string translated = Translate(unsuccessfulLoginNote, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+                        loginStatus.Text = "You are located in region " + this.regionName + "\r\n" + unsuccessfulLoginNote + "\r\n" + translated;
+                        loginString = "Unsuccessful login using username " + providedUsername + " timestamp " + now.ToString() + "\r\n";
+                    }
+                    w.WriteLine(loginString);
                 }
                 connection.Close();
             }
@@ -68,6 +78,11 @@ namespace calendarApp
                 MessageBox.Show("Must provide a valid username and password");
             }
         }
+        private static string GetThisFilePath([CallerFilePath] string path = null)
+        {
+            return path;
+        }
+
         private void withinFifteenMinutes(MySqlDataReader reader) // a function to check if appointment is within 15 minutes of current time. If it is a popup is displayed to notify user
         {
             DateTime currentDateTime = DateTime.Now;

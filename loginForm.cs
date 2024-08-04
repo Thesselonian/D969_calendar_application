@@ -12,13 +12,17 @@ namespace calendarApp
     public partial class loginForm : Form
     {
         private String regionName; // data member to hold the name of the region that the user is in
+        private string regionText; // contains the text for announcing region name on login form. Both English and translated
         public loginForm()
         {
             InitializeComponent();
             var regionInfo = RegionInfo.CurrentRegion; // instantiate class for region info
             var displayName = regionInfo.DisplayName;
             this.regionName = displayName;
-            loginStatus.Text = "You are located in region " + this.regionName;
+            string regionText = "You are located in region " + this.regionName;
+            string regionTextTranslated = Translate(regionText, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+            this.regionText = regionText + "\r\n" + regionTextTranslated;
+            loginStatus.Text = this.regionText;
         }
 
         private void loginButton_Click(object sender, EventArgs e) // function for when the login button is clicked
@@ -66,7 +70,7 @@ namespace calendarApp
                         string unsuccessfulLoginNote = "The username and password do not match.";
                         string translateTo = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "en" ? ("de") : (CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
                         string translated = Translate(unsuccessfulLoginNote, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
-                        loginStatus.Text = "You are located in region " + this.regionName + "\r\n" + unsuccessfulLoginNote + "\r\n" + translated;
+                        loginStatus.Text = this.regionText + "\r\n" + "\r\n" + unsuccessfulLoginNote + "\r\n" + translated;
                         loginString = "Unsuccessful login using username " + providedUsername + " timestamp " + now.ToString() + "\r\n";
                     }
                     w.WriteLine(loginString);

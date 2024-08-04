@@ -36,7 +36,6 @@ namespace calendarApp
                 {
                     string nextLine = string.Format("Year: {0} Month: {1} Number of Types: {2}\r\n", Convert.ToString(reader.GetInt32("year")), Convert.ToString(reader.GetInt32("month")), Convert.ToString(reader.GetInt32("count")));
                     report = concatenate(report, nextLine);
-                    //report += string.Format("Year: {0} Month: {1} Number of Types: {2}\r\n", Convert.ToString(reader.GetInt32("year")), Convert.ToString(reader.GetInt32("month")), Convert.ToString(reader.GetInt32("count")));
                 }
                 appointmentReportTextbox.Text = report;
                 connection.Close();
@@ -47,30 +46,15 @@ namespace calendarApp
                 string connectionString = "Server=localhost; database=client_schedule; UID=sqlUser; password=Passw0rd!";
                 MySqlConnection connection = new MySqlConnection(connectionString);
                 connection.Open();
-                string query = "SELECT * FROM appointment, user, customer WHERE appointment.userId = user.userId AND appointment.customerId = customer.customerId ORDER BY user.userId ASC;";
+                string query = "SELECT COUNT(appointmentId) AS numberAppointments, userName FROM appointment, user, customer WHERE appointment.userId = user.userId AND appointment.customerId = customer.customerId GROUP BY user.userId;";
                 MySqlCommand cmd = new MySqlCommand(query, connection);
                 MySqlDataReader reader = cmd.ExecuteReader();
                 string report = "";
-                string previousUser = ""; // a string to hold the userName for the record from the previous iteration of the while loop
-                string currentUser = "";
                 while (reader.Read())
                 {
-                    currentUser = reader.GetString("userName");
-                    DateTime startUtc = reader.GetDateTime("start");
-                    DateTime startLocal = startUtc.ToLocalTime();                    
-                    DateTime endUtc = reader.GetDateTime("end");
-                    DateTime endLocal = endUtc.ToLocalTime();
-                    if(currentUser != previousUser)
-                    {
-                        if(previousUser != "")
-                        {
-                            report += "\r\n \r\n";
-                        }
-                        report = concatenate(report, "Appointments for " + currentUser + "\r\n");
-                        //report += "Appointments for " + currentUser + "\r\n";
-                    }
-                    report += string.Format("Appointment type: {0} beginning at time {1} ending at time {2} with customer {3}\r\n", Convert.ToString(reader.GetString("type")), startLocal.ToString(), endLocal.ToString(), Convert.ToString(reader.GetString("customerName")));
-                    previousUser = currentUser;
+                    string userName = reader.GetString("userName");
+                    string numberAppointments = Convert.ToString(reader.GetInt32("numberAppointments"));
+                    report = concatenate(report, string.Format("User {0} has a total of {1} appointments\r\n", userName, numberAppointments));
                 }
                 appointmentReportTextbox.Text = report;
                 connection.Close();
@@ -87,7 +71,6 @@ namespace calendarApp
                 string report = "";
                 report = concatenate(report, string.Format("There are {0} total appointments", numberAppointments));
                 appointmentReportTextbox.Text = report;
-                //appointmentReportTextbox.Text = string.Format("There are {0} total appointments", numberAppointments);
                 connection.Close();
             }
         }

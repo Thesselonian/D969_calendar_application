@@ -3,8 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\Eric\\school\\wgu\\D969_software_2\\D969_calendar_application\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{50D131BB-B92E-484B-AF48-77554D6D035A}|calendarApp.csproj|C:\\Users\\Eric\\school\\wgu\\D969_software_2\\D969_calendar_application\\appointmentsreport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{50D131BB-B92E-484B-AF48-77554D6D035A}|calendarApp.csproj|c:\\users\\eric\\school\\wgu\\d969_software_2\\d969_calendar_application\\appointmentsreport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{50D131BB-B92E-484B-AF48-77554D6D035A}|calendarApp.csproj|solutionrelative:appointmentsreport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50D131BB-B92E-484B-AF48-77554D6D035A}|calendarApp.csproj|c:\\users\\eric\\school\\wgu\\d969_software_2\\d969_calendar_application\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50D131BB-B92E-484B-AF48-77554D6D035A}|calendarApp.csproj|solutionrelative:loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{50D131BB-B92E-484B-AF48-77554D6D035A}|calendarApp.csproj|C:\\Users\\Eric\\school\\wgu\\D969_software_2\\D969_calendar_application\\customerform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -15,7 +19,7 @@
       "RelativeMoniker": "D:0:0:{50D131BB-B92E-484B-AF48-77554D6D035A}|calendarApp.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{50D131BB-B92E-484B-AF48-77554D6D035A}|calendarApp.csproj|c:\\users\\eric\\school\\wgu\\d969_software_2\\d969_calendar_application\\customeredit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{50D131BB-B92E-484B-AF48-77554D6D035A}|calendarApp.csproj|C:\\Users\\Eric\\school\\wgu\\D969_software_2\\D969_calendar_application\\customeredit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{50D131BB-B92E-484B-AF48-77554D6D035A}|calendarApp.csproj|solutionrelative:customeredit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -26,11 +30,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
+              "Title": "loginForm.cs",
+              "DocumentMoniker": "C:\\Users\\Eric\\school\\wgu\\D969_software_2\\D969_calendar_application\\loginForm.cs",
+              "RelativeDocumentMoniker": "loginForm.cs",
+              "ToolTip": "C:\\Users\\Eric\\school\\wgu\\D969_software_2\\D969_calendar_application\\loginForm.cs",
+              "RelativeToolTip": "loginForm.cs",
+              "ViewState": "AQIAAFIAAAAAAAAAAAASwGsAAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-04T15:18:01.171Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Eric\\school\\wgu\\D969_software_2\\D969_calendar_application\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -38,8 +55,7 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABIAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-01T22:49:38.843Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-01T22:49:38.843Z"
             },
             {
               "$type": "Document",
@@ -49,14 +65,14 @@
               "RelativeDocumentMoniker": "appointmentsReport.cs",
               "ToolTip": "C:\\Users\\Eric\\school\\wgu\\D969_software_2\\D969_calendar_application\\appointmentsReport.cs",
               "RelativeToolTip": "appointmentsReport.cs",
-              "ViewState": "AQIAACYAAAAAAAAAAAAAwFgAAAA3AAAA",
+              "ViewState": "AQIAABcAAAAAAAAAAAAAwCIAAAAkAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-08-01T22:45:57.875Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "customerForm.cs",
               "DocumentMoniker": "C:\\Users\\Eric\\school\\wgu\\D969_software_2\\D969_calendar_application\\customerForm.cs",
               "RelativeDocumentMoniker": "customerForm.cs",
@@ -64,12 +80,11 @@
               "RelativeToolTip": "customerForm.cs",
               "ViewState": "AQIAAC0AAAAAAAAAAAAYwEMAAAAbAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-01T22:42:47.667Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-01T22:42:47.667Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "customerEdit.cs",
               "DocumentMoniker": "C:\\Users\\Eric\\school\\wgu\\D969_software_2\\D969_calendar_application\\customerEdit.cs",
               "RelativeDocumentMoniker": "customerEdit.cs",
@@ -77,8 +92,7 @@
               "RelativeToolTip": "customerEdit.cs",
               "ViewState": "AQIAAEAAAAAAAAAAAAAlwFIAAAAVAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-01T22:41:32.913Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-01T22:41:32.913Z"
             }
           ]
         }
